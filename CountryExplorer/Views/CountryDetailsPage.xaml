@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CountryExplorer.Views.CountryDetailsPage"
+             Title="{Binding CommonName}"
+             BackgroundColor="{AppThemeBinding Light=#F4F5F7, Dark=#121212}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Flag Header -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Padding="10"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+                <Image Source="{Binding FlagUrl}"
+                       HeightRequest="180"
+                       Aspect="AspectFit"
+                       HorizontalOptions="Center" />
+            </Border>
+
+            <!-- Main Details Card -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Padding="20"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+                <VerticalStackLayout Spacing="12">
+
+                    <Label Text="{Binding CommonName}"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+
+                    <Label Text="{Binding OfficialName}"
+                           FontSize="14"
+                           TextColor="Gray"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,-8,0,10" />
+
+                    <BoxView HeightRequest="1" Color="#E0E0E0" />
+
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                          ColumnDefinitions="120, *"
+                          RowSpacing="10">
+
+                        <Label Grid.Row="0" Grid.Column="0" Text="Capital:" FontAttributes="Bold" />
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding CapitalDisplay}" />
+
+                        <Label Grid.Row="1" Grid.Column="0" Text="Region:" FontAttributes="Bold" />
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Region}" />
+
+                        <Label Grid.Row="2" Grid.Column="0" Text="Subregion:" FontAttributes="Bold" />
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Subregion}" />
+
+                        <Label Grid.Row="3" Grid.Column="0" Text="Population:" FontAttributes="Bold" />
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding FormattedPopulation}" />
+
+                        <Label Grid.Row="4" Grid.Column="0" Text="Currencies:" FontAttributes="Bold" />
+                        <Label Grid.Row="4" Grid.Column="1" Text="{Binding CurrenciesDisplay}" />
+
+                        <Label Grid.Row="5" Grid.Column="0" Text="Languages:" FontAttributes="Bold" />
+                        <Label Grid.Row="5" Grid.Column="1" Text="{Binding LanguagesDisplay}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Button Text="Back to Countries"
+                    Clicked="OnBackButtonClicked"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    CornerRadius="8" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -14,7 +14,7 @@ public class CountryService
     {
         _httpClient = new HttpClient
         {
-            Timeout = TimeSpan.FromSeconds(10)
+            Timeout = TimeSpan.FromSeconds(15)
         };
         _httpClient.DefaultRequestHeaders.Add("User-Agent", "CountryExplorerApp");
     }

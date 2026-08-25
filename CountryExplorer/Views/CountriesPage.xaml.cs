@@ -13,6 +13,7 @@ public partial class CountriesPage : ContentPage
         InitializeComponent();
         _countryService = new CountryService();
         RegionPicker.SelectedIndex = 0;
+        SortPicker.SelectedIndex = 0;
     }
 
     protected override async void OnAppearing()
@@ -50,6 +51,7 @@ public partial class CountriesPage : ContentPage
         finally
         {
             ShowLoadingState(false);
+            CountryRefreshView.IsRefreshing = false;
         }
     }
 
@@ -59,6 +61,7 @@ public partial class CountriesPage : ContentPage
 
         string searchText = CountrySearchBar.Text?.Trim().ToLower() ?? string.Empty;
         string selectedRegion = RegionPicker.SelectedItem?.ToString() ?? "All Regions";
+        string sortOption = SortPicker.SelectedItem?.ToString() ?? "Name (A-Z)";
 
         var filtered = _allCountries.AsEnumerable();
 
@@ -74,9 +77,17 @@ public partial class CountriesPage : ContentPage
                 c.OfficialName.ToLower().Contains(searchText));
         }
 
-        var resultList = filtered.OrderBy(c => c.CommonName).ToList();
-        CountriesCollectionView.ItemsSource = resultList;
+        // Apply selected sort criteria
+        filtered = sortOption switch
+        {
+            "Name (Z-A)" => filtered.OrderByDescending(c => c.CommonName),
+            "Population (High-Low)" => filtered.OrderByDescending(c => c.Population),
+            "Population (Low-High)" => filtered.OrderBy(c => c.Population),
+            _ => filtered.OrderBy(c => c.CommonName)
+        };
 
+        var resultList = filtered.ToList();
+        CountriesCollectionView.ItemsSource = resultList;
         ResultCountLabel.Text = $"Showing {resultList.Count} of {_allCountries.Count} countries";
 
         if (resultList.Count == 0)
@@ -100,6 +111,22 @@ public partial class CountriesPage : ContentPage
     private async void OnReloadClicked(object sender, EventArgs e)
     {
         await LoadCountryDataAsync();
+    }
+
+    private async void OnRefreshRequested(object sender, EventArgs e)
+    {
+        await LoadCountryDataAsync();
+    }
+
+    private async void OnRandomCountryClicked(object sender, EventArgs e)
+    {
+        if (_allCountries.Count == 0) return;
+
+        var random = new Random();
+        int randomIndex = random.Next(_allCountries.Count);
+        var randomCountry = _allCountries[randomIndex];
+
+        await Navigation.PushAsync(new CountryDetailsPage(randomCountry));
     }
 
     private async void OnCountrySelected(object sender, TappedEventArgs e)

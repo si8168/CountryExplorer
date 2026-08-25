@@ -14,22 +14,29 @@ public class CountryService
     {
         _httpClient = new HttpClient
         {
-            Timeout = TimeSpan.FromSeconds(15)
+            Timeout = TimeSpan.FromSeconds(30) // Increased timeout for slower network connections
         };
-        _httpClient.DefaultRequestHeaders.Add("User-Agent", "CountryExplorerApp");
+        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("CountryExplorerApp/1.0");
     }
 
     public async Task<List<Country>> GetCountriesAsync()
     {
         try
         {
-            HttpResponseMessage response = await _httpClient.GetAsync(ApiUrl);
+            HttpResponseMessage response = await _httpClient.GetAsync(ApiUrl).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
-                string json = await response.Content.ReadAsStringAsync();
-                var parsedList = ParseCountriesFromJson(json);
-                if (parsedList.Count > 0) return parsedList;
+                string json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                // Offload JSON parsing to a background thread to prevent UI lockup (ANR crash)
+                var parsedList = await Task.Run(() => ParseCountriesFromJson(json)).ConfigureAwait(false);
+
+                if (parsedList != null && parsedList.Count > 0)
+                {
+                    Debug.WriteLine($"Successfully loaded {parsedList.Count} countries from REST API.");
+                    return parsedList;
+                }
             }
 
             Debug.WriteLine($"API Request returned status {response.StatusCode}. Loading fallback dataset.");
@@ -127,7 +134,6 @@ public class CountryService
         return countryList;
     }
 
-    // Comprehensive multi-region dataset with full currency and language details
     private List<Country> GetExpandedCountryDataset()
     {
         return new List<Country>

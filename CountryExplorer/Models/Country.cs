@@ -1,4 +1,5 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using CountryExplorer.Services;
 
 namespace CountryExplorer.Models;
 
@@ -28,12 +29,16 @@ public class Country
     [JsonPropertyName("languages")]
     public Dictionary<string, string>? Languages { get; set; }
 
-    // Display helpers for UI bindings
+    // Display helpers for bindings
     public string CommonName => NameData?.Common ?? "Unknown Country";
     public string OfficialName => NameData?.Official ?? "N/A";
     public string CapitalDisplay => (CapitalList != null && CapitalList.Count > 0) ? string.Join(", ", CapitalList) : "N/A";
     public string FlagUrl => Flags?.Png ?? Flags?.Svg ?? string.Empty;
     public string FormattedPopulation => Population.ToString("N0");
+
+    // Favorites state binding helper
+    public bool IsFavorite => FavoritesService.IsFavorite(CommonName);
+    public string FavoriteIcon => IsFavorite ? "❤️" : "🤍";
 
     public string CurrenciesDisplay
     {

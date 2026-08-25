@@ -6,10 +6,11 @@
              BackgroundColor="{AppThemeBinding Light=#F4F5F7, Dark=#121212}">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="🎲 Random" Clicked="OnRandomCountryClicked" Priority="0" />
+        <ToolbarItem x:Name="FavFilterToolbarItem" Text="❤️ Favorites Only" Clicked="OnToggleFavoritesFilterClicked" Priority="0" />
+        <ToolbarItem Text="🎲 Random" Clicked="OnRandomCountryClicked" Priority="1" />
     </ContentPage.ToolbarItems>
 
-    <Grid RowDefinitions="Auto, *">
+    <Grid RowDefinitions="Auto, Auto, *">
 
         <!-- Controls Header -->
         <VerticalStackLayout Grid.Row="0" Padding="15,10,15,5" Spacing="8">
@@ -18,12 +19,9 @@
                        TextChanged="OnSearchOrFilterChanged" />
 
             <Grid ColumnDefinitions="*, *, Auto" ColumnSpacing="10">
-                <!-- Region Filter -->
                 <VerticalStackLayout Grid.Column="0" Spacing="2">
                     <Label Text="Region" FontSize="11" TextColor="Gray" />
-                    <Picker x:Name="RegionPicker"
-                            Title="Select Region"
-                            SelectedIndexChanged="OnSearchOrFilterChanged">
+                    <Picker x:Name="RegionPicker" Title="Select Region" SelectedIndexChanged="OnSearchOrFilterChanged">
                         <Picker.ItemsSource>
                             <x:Array Type="{x:Type x:String}">
                                 <x:String>All Regions</x:String>
@@ -37,12 +35,9 @@
                     </Picker>
                 </VerticalStackLayout>
 
-                <!-- Sort Order -->
                 <VerticalStackLayout Grid.Column="1" Spacing="2">
                     <Label Text="Sort By" FontSize="11" TextColor="Gray" />
-                    <Picker x:Name="SortPicker"
-                            Title="Sort Order"
-                            SelectedIndexChanged="OnSearchOrFilterChanged">
+                    <Picker x:Name="SortPicker" Title="Sort Order" SelectedIndexChanged="OnSearchOrFilterChanged">
                         <Picker.ItemsSource>
                             <x:Array Type="{x:Type x:String}">
                                 <x:String>Name (A-Z)</x:String>
@@ -54,79 +49,52 @@
                     </Picker>
                 </VerticalStackLayout>
 
-                <Button Grid.Column="2"
-                        Text="Reload"
-                        Clicked="OnReloadClicked"
-                        VerticalOptions="End"
-                        Margin="0,0,0,2" />
+                <Button Grid.Column="2" Text="Reload" Clicked="OnReloadClicked" VerticalOptions="End" Margin="0,0,0,2" />
             </Grid>
 
-            <Label x:Name="ResultCountLabel"
-                   Text="Loading countries..."
-                   FontSize="13"
-                   TextColor="Gray"
-                   Margin="5,2,0,0" />
+            <!-- Quick Stats Summary Banner -->
+            <Border StrokeShape="RoundRectangle 8" Padding="10" BackgroundColor="{AppThemeBinding Light=#E3F2FD, Dark=#1E293B}">
+                <Grid ColumnDefinitions="*, *">
+                    <VerticalStackLayout Grid.Column="0">
+                        <Label x:Name="ResultCountLabel" Text="Loading..." FontSize="12" FontAttributes="Bold" TextColor="#2196F3" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                        <Label x:Name="TotalPopulationLabel" Text="Total Pop: 0" FontSize="12" TextColor="Gray" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
         </VerticalStackLayout>
 
-        <!-- Main Content Area -->
-        <Grid Grid.Row="1">
+        <!-- Main Content Grid -->
+        <Grid Grid.Row="2">
 
-            <!-- Loading Indicator -->
-            <VerticalStackLayout x:Name="LoadingView"
-                                 VerticalOptions="Center"
-                                 HorizontalOptions="Center"
-                                 Spacing="15"
-                                 IsVisible="False">
-                <ActivityIndicator x:Name="LoadingIndicator"
-                                   IsRunning="True"
-                                   HeightRequest="45"
-                                   WidthRequest="45"
-                                   Color="#2196F3" />
+            <VerticalStackLayout x:Name="LoadingView" VerticalOptions="Center" HorizontalOptions="Center" Spacing="15" IsVisible="False">
+                <ActivityIndicator x:Name="LoadingIndicator" IsRunning="True" HeightRequest="45" WidthRequest="45" Color="#2196F3" />
                 <Label Text="Fetching latest data..." FontSize="14" TextColor="Gray" />
             </VerticalStackLayout>
 
-            <!-- Error State -->
-            <VerticalStackLayout x:Name="StatusMessageView"
-                                 VerticalOptions="Center"
-                                 HorizontalOptions="Center"
-                                 Padding="30"
-                                 Spacing="15"
-                                 IsVisible="False">
-                <Label x:Name="StatusMessageLabel"
-                       Text="No countries found."
-                       HorizontalTextAlignment="Center"
-                       FontSize="16"
-                       TextColor="Gray" />
+            <VerticalStackLayout x:Name="StatusMessageView" VerticalOptions="Center" HorizontalOptions="Center" Padding="30" Spacing="15" IsVisible="False">
+                <Label x:Name="StatusMessageLabel" Text="No countries found." HorizontalTextAlignment="Center" FontSize="16" TextColor="Gray" />
                 <Button Text="Try Again" Clicked="OnReloadClicked" WidthRequest="140" />
             </VerticalStackLayout>
 
-            <!-- Pull to Refresh List -->
-            <RefreshView x:Name="CountryRefreshView"
-                         Refreshing="OnRefreshRequested">
-                <CollectionView x:Name="CountriesCollectionView"
-                                Margin="15,5,15,10"
-                                SelectionMode="None">
+            <RefreshView x:Name="CountryRefreshView" Refreshing="OnRefreshRequested">
+                <CollectionView x:Name="CountriesCollectionView" Margin="15,5,15,10" SelectionMode="None">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border Margin="0,0,0,12"
-                                    Padding="12"
-                                    StrokeShape="RoundRectangle 10"
-                                    StrokeThickness="1"
-                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
-                                <Grid ColumnDefinitions="90, *" ColumnSpacing="15">
-                                    <Image Grid.Column="0"
-                                           Source="{Binding FlagUrl, FallbackValue='?'}"
-                                           Aspect="AspectFit"
-                                           HeightRequest="60"
-                                           WidthRequest="90"
-                                           VerticalOptions="Center" />
+                            <Border Margin="0,0,0,12" Padding="12" StrokeShape="RoundRectangle 10" StrokeThickness="1" BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}">
+                                <Grid ColumnDefinitions="80, *, Auto" ColumnSpacing="12">
+                                    <Image Grid.Column="0" Source="{Binding FlagUrl, FallbackValue='?'}" Aspect="AspectFit" HeightRequest="55" WidthRequest="80" VerticalOptions="Center" />
 
-                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="3">
-                                        <Label Text="{Binding CommonName}" FontAttributes="Bold" FontSize="17" />
-                                        <Label Text="{Binding CapitalDisplay, StringFormat='Capital: {0}'}" FontSize="13" TextColor="Gray" />
-                                        <Label Text="{Binding Region, StringFormat='Region: {0}'}" FontSize="13" TextColor="Gray" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding CommonName}" FontAttributes="Bold" FontSize="16" />
+                                        <Label Text="{Binding CapitalDisplay, StringFormat='Capital: {0}'}" FontSize="12" TextColor="Gray" />
+                                        <Label Text="{Binding Region, StringFormat='Region: {0}'}" FontSize="12" TextColor="Gray" />
                                         <Label Text="{Binding FormattedPopulation, StringFormat='Pop: {0}'}" FontSize="12" TextColor="#2196F3" />
                                     </VerticalStackLayout>
+
+                                    <!-- Favorite Button -->
+                                    <Button Grid.Column="2" Text="{Binding FavoriteIcon}" FontSize="18" BackgroundColor="Transparent" Clicked="OnFavoriteButtonClicked" CommandParameter="{Binding .}" VerticalOptions="Center" HeightRequest="40" WidthRequest="45" />
                                 </Grid>
 
                                 <Border.GestureRecognizers>
